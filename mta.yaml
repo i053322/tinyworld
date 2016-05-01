@@ -1,0 +1,54 @@
+ID: takt7demo1122334
+version: 0.0.1
+
+modules:
+
+- name: node-hello-world-db
+  type: hdb
+  path: ./db
+  properties:
+  requires:
+     - name: saphana
+        
+- name: node-hello-world-backend
+  type: nodejs
+  path: ./js
+  properties:
+  requires:
+     - name: node-hello-world-db
+     - name: saphana
+     - name: uaa
+  provides:
+     - name: backend_api
+
+- name: node-hello-world
+  type: html5
+  path: ./web
+  properties:
+  requires:
+     - name: uaa                    # dependency on the UAA service
+     - name: backend_api            # name of �provides� element in the XSJS project
+       group: destinations          # name of target environment variable
+       properties:
+          name: nodejs            # key values in json format entered in to �destination� variable
+          url:  $$http://somehost:someport/$$    # REPLACE ME
+          forwardAuthToken: true
+     - name: ui5
+       group: destinations
+       properties:
+          name: ui5
+          url: https://sapui5.netweaver.ondemand.com
+          proxyHost: proxy.wdf.sap.corp
+          proxyPort: 8080
+  
+# Resources describe required services
+
+
+resources:
+  - name: saphana
+    type: com.sap.xs.hdi-container
+
+  - name: uaa
+    type: com.sap.xs.uaa
+
+  - name: ui5
